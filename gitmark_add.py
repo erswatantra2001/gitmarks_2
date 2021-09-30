@@ -277,3 +277,40 @@ if __name__ == '__main__':
 	opts = {'push': options.push, 'tags': options.tags, 'msg': options.msg, 'content':options.content, 'private':options.private}
 
 	g = process_gitmarks_cmd(opts, args)
+	
+	
+	
+# this is the new code for gitmark_add.py
+
+  def __init__(self, username, password=''):
+		# API URL: https://user:passwd@api.del.icio.us/v1/posts/all
+        url = "https://%s:%s@api.del.icio.us/v1/posts/all" % (username, password)
+        h = urllib.urlopen(url)
+        content = h.read()
+        h.close()
+                
+        x = minidom.parseString(content)
+        
+        # sample post: <post href="http://www.pixelbeat.org/cmdline.html" hash="e3ac1d1e4403d077ee7e65f62a55c406" description="Linux Commands - A practical reference" tag="linux tutorial reference" time="2010-11-29T01:07:35Z" extended="" meta="c79362665abb0303d577b6b9aa341599" />
+        post_list = x.getElementsByTagName('post')
+        for post_index, post in enumerate(post_list):
+            url = post.getAttribute('href')
+            desc = post.getAttribute('description')
+            tags = ",".join([t for t in post.getAttribute('tag').split()])
+            timestamp = post.getAttribute('time')
+            
+            options = {}
+            options['tags'] = tags
+            options['push'] = False
+            options['msg'] = desc
+            
+            args = [url]
+
+            g = gitMark(options, args)
+            if post_list.length > 1:
+                print '%d of %d bookmarks imported (%d%%)' % (
+                    post_index + 1, post_list.length,
+                    (post_index + 1.0) / post_list.length * 100)
+		
+		
+# 		this small addition will help to run code
